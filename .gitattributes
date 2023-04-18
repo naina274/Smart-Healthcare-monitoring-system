@@ -1,3 +1,4 @@
 path/to/large/file filter=lfs diff=lfs merge=lfs -text
-dotnet-sdk-6.0.408-osx-x64.pkg filter=lfs diff=lfs merge=lfs -text
+/dotnet-sdk-6.0.408-osx-x64.pkg
+ filter=lfs diff=lfs merge=lfs -text
 *.pkg filter=lfs diff=lfs merge=lfs -text
