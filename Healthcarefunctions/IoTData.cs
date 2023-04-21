@@ -20,13 +20,17 @@ using System.Collections;
 namespace IotData.Function
 {
     public class SensorData
-    {
-        [JsonProperty("id")]
-        public string Id { get; set; }
-        public double TemperatureAlert { get; set; }
-        public double BloodPressureAlert { get; set; }
-        public double HeartRateAlert { get; set; }
-    }
+{
+    [JsonProperty("id")]
+    public string Id { get; set; }
+    [JsonProperty("temperature")]
+    public double TemperatureAlert { get; set; }
+    [JsonProperty("bloodpressure")]
+    public double BloodPressureAlert { get; set; }
+    [JsonProperty("heartrate")]
+    public double HeartRateAlert { get; set; }
+}
+
 
     public static class IoTData
     {
@@ -72,10 +76,10 @@ namespace IotData.Function
         [CosmosDB(databaseName: "IoTData",
               collectionName: "sensordata",
               ConnectionStringSetting = "cosmosDBConnectionString",
-              SqlQuery = "SELECT * FROM c")] IEnumerable SensorData,
+              SqlQuery = "SELECT TOP 10 c.id, c.temperature, c.heartrate, c.bloodpressure FROM c ORDER BY c._ts DESC")] IEnumerable <SensorData> sensorData,
         ILogger log)
     {
-        return new OkObjectResult(SensorData);
+        return new OkObjectResult(sensorData);
     }
 
     }

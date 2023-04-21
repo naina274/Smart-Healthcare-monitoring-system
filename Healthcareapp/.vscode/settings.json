@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "bin/Release/net6.0/publish",
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/a7b17c08-678b-4997-bca2-803f5236c23f/resourceGroups/healthcaresensor/providers/Microsoft.Web/sites/healthcaremonitorapp"
+}

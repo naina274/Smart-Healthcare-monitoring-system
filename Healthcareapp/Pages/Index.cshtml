@@ -1,12 +1,264 @@
-﻿
-@page
+﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Smart Healthcare Monitoring System";
 }
+<style>
+    body {
+        background-color: lavender !important;
+        font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+        color: #333;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">Last Sensor Value</h1>
-    <p></p>
-    <iframe src="http://localhost:7071/api/sensordata/">
+    .container {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 20px 30px;
+        text-align: center;
+    }
+
+    .header {
+        margin-bottom: 30px;
+    }
+
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        color: black;
+    }
+
+    p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        color: black;
+    }
+
+    .sensor {
+        border: none;
+        padding: 20px;
+        background-color: #fff;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 60px;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #555;
+    }
+
+    .chart-container {
+        width: 100%;
+        max-width: 1000px;
+        height: 500px;
+        margin: 0;
+        align-items: flex-start;
+    }
+
+    canvas {
+        width: 100%;
+        height: 100%;
+        transform: none;
+    }
+</style>
+<div class="container">
+    <header>
+        <h1>Smart Healthcare Monitoring System</h1>
+        <p>Welcome to the Smart Healthcare Monitoring System! Our advanced sensors and data analytics provide real-time monitoring of vital signs such as heart rate, blood pressure, and temperature. By continuously monitoring these parameters, doctors and caregivers can quickly detect any abnormalities and take appropriate action. Our cloud-based system offers secure and reliable data storage, with easy access for authorized healthcare professionals.</p>
+    </header>
+
+    <main>
+        <section class="sensor">
+            <div class="chart-container">
+                <h2>Temperature</h2>
+                <canvas id="temperature-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Heart Rate</h2>
+                <canvas id="heart-rate-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Blood Pressure</h2>
+                <canvas id="blood-pressure-chart"></canvas>
+            </div>
+        </section>
+    </main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"></script>
+
+<script>
+  var temperatureCanvas = document.getElementById('temperature-chart').getContext('2d');
+  var heartRateCanvas = document.getElementById('heart-rate-chart').getContext('2d');
+  var bloodPressureCanvas = document.getElementById('blood-pressure-chart').getContext('2d');
+
+  var temperatureChart = new Chart(temperatureCanvas, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Temperature',
+        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+        borderColor: 'rgba(255, 206, 86, 1)',
+        borderWidth: 1,
+        data: []
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          ticks: {
+            beginAtZero: true
+          }
+        }
+      }
+    }
+  });
+
+  var heartRateChart = new Chart(heartRateCanvas, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Heart Rate',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1,
+        data: []
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          ticks: {
+            beginAtZero: true
+          }
+        }
+      }
+    }
+  });
+
+  var bloodPressureChart = new Chart(bloodPressureCanvas, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Blood Pressure',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        data: []
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          ticks: {
+            beginAtZero: true
+          }
+        }
+      }
+    }
+  });
+
+  setInterval(function() {
+    fetch('https://healthcarefunction.azurewebsites.net/api/sensordata/')
+      .then(response => response.json())
+      .then(data => {
+        var latestData = data.map(function(item) {
+          return {
+            id: item.id.slice(0,8),
+            temperature: item.temperature,
+            bloodpressure: item.bloodpressure,
+            heartrate: item.heartrate
+          }
+        });
+        var labels = [];
+        var temperatureValues = [];
+        var bloodpressureValues = [];
+        var heartrateValues = [];
+
+        latestData.forEach(function(item) {
+          labels.push(item.id);
+          temperatureValues.push(item.temperature);
+          bloodpressureValues.push(item.bloodpressure);
+          heartrateValues.push(item.heartrate);
+        });
+
+        temperatureChart.data.labels = labels;
+        temperatureChart.data.datasets[0].data = temperatureValues;
+        temperatureChart.update();
+
+        heartRateChart.data.labels = labels;
+        heartRateChart.data.datasets[0].data = heartrateValues;
+        heartRateChart.update();
+
+        bloodPressureChart.data.labels = labels;
+        bloodPressureChart.data.datasets[0].data = bloodpressureValues;
+        bloodPressureChart.update();
+        
+      });
+    }, 5000);
+</script>  
+
+<!-- Import Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<div class="container mt-4">
+  <h1>Latest Sensor Data</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Temperature</th>
+        <th>Blood Pressure</th>
+        <th>Heart Rate</th>
+      </tr>
+    </thead>
+    <tbody id="sensor-data">
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Get the tbody element
+  var tbody = document.getElementById('sensor-data');
+
+  // Retrieve the latest sensor data and update the table every 5 seconds
+  setInterval(function() {
+    fetch('https://healthcarefunction.azurewebsites.net/api/sensordata/?format=json')
+      .then(response => response.json())
+      .then(data => {
+        // Clear the tbody element
+        tbody.innerHTML = '';
+
+        // Add a row for each item in the data array
+        data.forEach(function(item) {
+          var row = document.createElement('tr');
+          var id = document.createElement('td');
+          var temperature = document.createElement('td');
+          var bloodPressure = document.createElement('td');
+          var heartRate = document.createElement('td');
+
+          id.innerText = item.id;
+          temperature.innerText = item.temperature.toFixed(2);
+          bloodPressure.innerText = item.bloodpressure.toFixed(2);
+          heartRate.innerText = item.heartrate.toFixed(2);
+
+          row.appendChild(id);
+          row.appendChild(temperature);
+          row.appendChild(bloodPressure);
+          row.appendChild(heartRate);
+
+          tbody.appendChild(row);
+        });
+      });
+  }, 5000);
+</script>
+  
+  <div class="footer">
+    <p>Copyright © Smart Healthcare Monitoring System</p>
+  </div>
 </div>
